@@ -210,8 +210,16 @@ function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;
 function fmt(s) {
   // Escapa o HTML primeiro por segurança, depois aplica negrito e itálico
   let t = esc(s);
-  t = t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); // Transforma **texto** em negrito
-  t = t.replace(/\*(.+?)\*/g, '<i>$1</i>');     // Transforma *texto* em itálico
+ 
+  // 1º: Transforma ***texto*** em negrito e itálico juntos
+  t = t.replace(/\*\*\*(.+?)\*\*\*/g, '<b><i>$1</i></b>'); 
+  
+  // 2º: Transforma **texto** em apenas negrito
+  t = t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); 
+  
+  // 3º: Transforma *texto* em apenas itálico
+  t = t.replace(/\*(.+?)\*/g, '<i>$1</i>');
+  
   return t;
 }
 function render(){
