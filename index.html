@@ -207,7 +207,13 @@ const T={killers:"Assassinos",survivors:"Sobreviventes",perks:"Perks",realms:"Re
 let cur="killers";
 const $=id=>document.getElementById(id);
 function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
-
+function fmt(s) {
+  // Escapa o HTML primeiro por segurança, depois aplica negrito e itálico
+  let t = esc(s);
+  t = t.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); // Transforma **texto** em negrito
+  t = t.replace(/\*(.+?)\*/g, '<i>$1</i>');     // Transforma *texto* em itálico
+  return t;
+}
 function render(){
  const d=D[cur],q=$("q").value.trim().toLowerCase(),f=$("f").value;
  
@@ -222,7 +228,7 @@ function render(){
    return `<article class="card">
      <div class="card-head">${img}<h3>${esc(a[0])}</h3></div>
      <p class="meta"><span class="tag">${esc(a[1])}</span></p>
-     <p>${esc(a[2])}</p>
+     <p>${fmt(a[2])}</p>
    </article>`;
  }).join(""):'<div class="empty">Nada encontrado. Tente outro termo.</div>';
 }
