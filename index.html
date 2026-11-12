@@ -25,7 +25,13 @@ input{flex:1;min-width:200px}
 .count{color:var(--mu);margin:0 0 10px;font-size:.9rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
 .card{background:var(--sf);border:1px solid var(--ln);border-left:4px solid var(--ac);padding:14px 16px;border-radius:2px}
-.card h3{margin:0 0 2px;font-size:1.15rem}
+
+/* --- CSS NOVO PARA AS IMAGENS --- */
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.card-head h3{margin:0;font-size:1.15rem}
+.thumb{width:48px;height:48px;object-fit:cover;object-position:top center;border-radius:4px;border:1px solid var(--ln);flex:0 0 auto;background:var(--bg)}
+/* -------------------------------- */
+
 .meta{color:var(--mu);font-size:.85rem;margin:0 0 8px}
 .card p{margin:0 0 6px;font-size:.95rem}
 .card b{font-weight:700}
@@ -48,7 +54,7 @@ footer{max-width:960px;margin:20px auto 40px;padding:0 20px;color:var(--mu);font
 </main>
 <footer>Site de fãs, sem ligação com a Behaviour Interactive. Dead by Daylight é marca de seus respectivos donos. Cobertura parcial: a wiki da comunidade lista hoje 324 perks, 54 sobreviventes, 22 reinos e 47 mapas, e este site mostra só uma parte. Nomes em português aparecem apenas onde foram confirmados em fontes brasileiras; os demais ficam no original. Uma reformulação de 58 perks foi anunciada para a versão 10.2.0 (teste aberto em 15/09/2026), então efeitos podem ter mudado: confira no jogo.</footer>
 <script>
-// Formato: nome|tipo|descrição (texto próprio, resumido)
+// Formato: nome|tipo|descrição|imagem(opcional)
 const D={
 killers:{f:"Estilo",items:[
 "O Caçador|Armadilhas|Espalha armadilhas de urso pelo mapa para prender sobreviventes. Bom para controlar áreas.|img/cacador.webp",
@@ -201,12 +207,26 @@ const T={killers:"Assassinos",survivors:"Sobreviventes",perks:"Perks",realms:"Re
 let cur="killers";
 const $=id=>document.getElementById(id);
 function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
 function render(){
  const d=D[cur],q=$("q").value.trim().toLowerCase(),f=$("f").value;
- const r=d.items.map(s=>s.split("|")).filter(a=>(!f||a[1]===f)&&(!q||a.join(" ").toLowerCase().includes(q)));
+ 
+ // Busca apenas nos 3 primeiros campos (nome, tipo, desc), ignorando a imagem
+ const r=d.items.map(s=>s.split("|")).filter(a=>(!f||a[1]===f)&&(!q||`${a[0]} ${a[1]} ${a[2]}`.toLowerCase().includes(q)));
+ 
  $("n").textContent=r.length+(r.length===1?" resultado":" resultados");
- $("g").innerHTML=r.length?r.map(a=>`<article class="card"><h3>${esc(a[0])}</h3><p class="meta"><span class="tag">${esc(a[1])}</span></p><p>${esc(a[2])}</p></article>`).join(""):'<div class="empty">Nada encontrado. Tente outro termo.</div>';
+ 
+ // Monta os cards verificando se a imagem (a[3]) existe
+ $("g").innerHTML=r.length?r.map(a=>{
+   const img=a[3]?`<img class="thumb" src="${esc(a[3])}" alt="Retrato de ${esc(a[0])}" loading="lazy">`:"";
+   return `<article class="card">
+     <div class="card-head">${img}<h3>${esc(a[0])}</h3></div>
+     <p class="meta"><span class="tag">${esc(a[1])}</span></p>
+     <p>${esc(a[2])}</p>
+   </article>`;
+ }).join(""):'<div class="empty">Nada encontrado. Tente outro termo.</div>';
 }
+
 function setTab(k){
  cur=k;$("q").value="";
  [...document.querySelectorAll("#tabs button")].forEach(b=>b.setAttribute("aria-selected",b.dataset.k===k));
